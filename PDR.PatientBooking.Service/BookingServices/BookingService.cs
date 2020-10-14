@@ -23,12 +23,12 @@ namespace PDR.PatientBooking.Service.BookingServices
 
         public void AddBooking(AddBookingRequest request)
         {
-            //var validationResult = _validator.ValidateRequest(request);
+            var validationResult = _validator.ValidateRequest(request);
 
-            //if (!validationResult.PassedValidation)
-            //{
-            //    throw new ArgumentException(validationResult.Errors.First());
-            //}
+            if (!validationResult.PassedValidation)
+            {
+                throw new ArgumentException(validationResult.Errors.First());
+            }
 
             var surgeryType = _context.Patient
                 .Include(p => p.Clinic)
