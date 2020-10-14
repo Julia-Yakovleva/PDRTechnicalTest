@@ -13,42 +13,32 @@ namespace PDR.PatientBookingApi.Controllers
     [ApiController]
     public class BookingController : ControllerBase
     {
-        private readonly PatientBookingContext _context;
         private readonly IBookingService _bookingService;
 
-        public BookingController(PatientBookingContext context, IBookingService bookingService)
+        public BookingController(IBookingService bookingService)
         {
-            _context = context;
+            // As BookingController differed a lot from other controllers and was not easy
+            // to update the decision was made to refactor it and introduce BookingService.
+            // Refactoring should always be taken with caution, be agreed within the project
+            // and made sure everything still works as expected.
             _bookingService = bookingService;
         }
 
         [HttpGet("patient/{identificationNumber}/next")]
         public IActionResult GetPatientNextAppointnemtn(long identificationNumber)
         {
-            var bockings = _context.Order.OrderBy(x => x.StartTime).ToList();
+            try
+            {
+                var appointment = _bookingService.GetNextBooking(identificationNumber);
 
-            if (bockings.Where(x => x.Patient.Id == identificationNumber).Count() == 0)
-            {
-                return StatusCode(502);
-            }
-            else
-            {
-                var bookings2 = bockings.Where(x => x.PatientId == identificationNumber);
-                if (bookings2.Where(x => x.StartTime > DateTime.Now).Count() == 0)
-                {
+                if (appointment == null)
                     return StatusCode(502);
-                }
                 else
-                {
-                    var bookings3 = bookings2.Where(x => x.StartTime > DateTime.Now);
-                    return Ok(new
-                    {
-                        bookings3.First().Id,
-                        bookings3.First().DoctorId,
-                        bookings3.First().StartTime,
-                        bookings3.First().EndTime
-                    });
-                }
+                    return Ok(appointment);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
             }
         }
 

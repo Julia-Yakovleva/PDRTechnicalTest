@@ -2,6 +2,7 @@
 using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Data.Models;
 using PDR.PatientBooking.Service.BookingServices.Requests;
+using PDR.PatientBooking.Service.BookingServices.Responses;
 using PDR.PatientBooking.Service.BookingServices.Validation;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,22 @@ namespace PDR.PatientBooking.Service.BookingServices
             });
 
             _context.SaveChanges();
+        }
+
+        public GetPatientNextBookingResponse GetNextBooking(long patientId)
+        {
+            return _context.Order
+                .Where(o => o.PatientId == patientId)
+                .Where(o => o.StartTime > DateTime.Now)
+                .OrderBy(o => o.StartTime)
+                .Select(o => new GetPatientNextBookingResponse
+                {
+                    Id = o.Id,
+                    DoctorId = o.DoctorId,
+                    StartTime = o.StartTime,
+                    EndTime = o.EndTime
+                })
+                .FirstOrDefault();
         }
     }
 }
