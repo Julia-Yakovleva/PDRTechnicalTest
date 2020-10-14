@@ -1,6 +1,7 @@
 ﻿using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Service.DoctorServices.Requests;
 using PDR.PatientBooking.Service.Validation;
+using PDR.PatientBooking.Service.Validation.Email;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,17 +10,19 @@ namespace PDR.PatientBooking.Service.DoctorServices.Validation
     public class AddDoctorRequestValidator : IAddDoctorRequestValidator
     {
         private readonly PatientBookingContext _context;
+        private readonly IEmailValidator _emailValidator;
 
-        public AddDoctorRequestValidator(PatientBookingContext context)
+        public AddDoctorRequestValidator(PatientBookingContext context, IEmailValidator emailValidator)
         {
             _context = context;
+            _emailValidator = emailValidator;
         }
 
         public PdrValidationResult ValidateRequest(AddDoctorRequest request)
         {
             var result = new PdrValidationResult(true);
 
-            if (MissingRequiredFields(request, ref result))
+            if (InvalidFields(request, ref result))
                 return result;
 
             if (DoctorAlreadyInDb(request, ref result))
@@ -28,7 +31,7 @@ namespace PDR.PatientBooking.Service.DoctorServices.Validation
             return result;
         }
 
-        public bool MissingRequiredFields(AddDoctorRequest request, ref PdrValidationResult result)
+        public bool InvalidFields(AddDoctorRequest request, ref PdrValidationResult result)
         {
             var errors = new List<string>();
 
@@ -40,6 +43,9 @@ namespace PDR.PatientBooking.Service.DoctorServices.Validation
 
             if (string.IsNullOrEmpty(request.Email))
                 errors.Add("Email must be populated");
+
+            if(!_emailValidator.Validate(request.Email))
+                errors.Add("Email must be a valid email address");
 
             if (errors.Any())
             {

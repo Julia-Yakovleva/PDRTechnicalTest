@@ -6,6 +6,7 @@ using PDR.PatientBooking.Data;
 using PDR.PatientBooking.Data.Models;
 using PDR.PatientBooking.Service.DoctorServices.Requests;
 using PDR.PatientBooking.Service.DoctorServices.Validation;
+using PDR.PatientBooking.Service.Validation.Email;
 using System;
 
 namespace PDR.PatientBooking.Service.Tests.DoctorServices.Validation
@@ -30,13 +31,15 @@ namespace PDR.PatientBooking.Service.Tests.DoctorServices.Validation
 
             // Mock setup
             _context = new PatientBookingContext(new DbContextOptionsBuilder<PatientBookingContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+            var emailValidator = new EmailValidator();
 
             // Mock default
             SetupMockDefaults();
 
             // Sut instantiation
             _addDoctorRequestValidator = new AddDoctorRequestValidator(
-                _context
+                _context,
+                emailValidator
             );
         }
 
