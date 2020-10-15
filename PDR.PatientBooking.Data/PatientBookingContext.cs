@@ -9,6 +9,11 @@ namespace PDR.PatientBooking.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Order>().HasQueryFilter(o => !o.IsCancelled);
+        }
+
         public DbSet<Order> Order { get; set; }
         public DbSet<Patient> Patient { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
