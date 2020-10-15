@@ -19,4 +19,8 @@
     <ProjectReference Include="..\PDR.PatientBooking.Service\PDR.PatientBooking.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BookingServices\Validation\" />
+  </ItemGroup>
+
 </Project>
