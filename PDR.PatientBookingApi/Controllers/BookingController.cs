@@ -60,6 +60,29 @@ namespace PDR.PatientBookingApi.Controllers
             }
         }
 
+        // As it's difficult to predict how Order will evolve without background info
+        // the clearest solution is to implement cancellation as soft delete.
+        // Another approach is to add Status to order but it has to be maintained.
+        // For example when an appointment is passed it probably should have the status 
+        // other than Active which introduces extra complexity.
+        [HttpDelete("{bookingId}")]
+        public IActionResult CancelBooking(Guid bookingId)
+        {
+            try
+            {
+                _bookingService.CancelBooking(bookingId);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
         private static MyOrderResult UpdateLatestBooking(List<Order> bookings2, int i)
         {
             MyOrderResult latestBooking;

@@ -49,6 +49,18 @@ namespace PDR.PatientBooking.Service.BookingServices
             _context.SaveChanges();
         }
 
+        public void CancelBooking(Guid bookingId)
+        {
+            var booking = _context.Order.FirstOrDefault(o => o.Id == bookingId);
+
+            if (booking == null)
+                throw new ArgumentException("Booking does not exist");
+
+            booking.IsCancelled = true;
+
+            _context.SaveChanges();
+        }
+
         public GetPatientNextBookingResponse GetNextBooking(long patientId)
         {
             return _context.Order
